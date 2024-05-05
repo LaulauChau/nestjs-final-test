@@ -1,18 +1,33 @@
-import { Injectable, NotImplementedException } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
+import type { User } from '@prisma/client';
+import { DatabaseService } from '../infrastructure/database/database.service';
 
 @Injectable()
 export class UserService {
-    constructor() {}
+    constructor(private readonly databaseService: DatabaseService) {}
 
-    addUser(email: string): Promise<void> {
-        throw new NotImplementedException();
+    async addUser(email: string): Promise<User> {
+        const existingUser = await this.getUser(email);
+
+        if (existingUser) {
+            throw new ConflictException();
+        }
+
+        return this.databaseService.user.create({ data: { email } });
     }
 
-    getUser(email: string): Promise<unknown> {
-        throw new NotImplementedException();
+    async getUser(email: string): Promise<User> {
+        return this.databaseService.user.findUnique({ where: { email } });
     }
 
-    resetData(): Promise<void> {
-        throw new NotImplementedException();
+    async resetData(): Promise<void> {
+        await new Promise((resolve) =>
+            setTimeout(async () => {
+                await this.databaseService.user.deleteMany();
+                resolve('User data has been reset.');
+            }, 1000),
+        );
+
+        return;
     }
 }
