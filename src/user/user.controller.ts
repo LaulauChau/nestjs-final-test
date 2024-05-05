@@ -9,8 +9,8 @@ export class UserController {
     @Post()
     async register(
         @Body(new ValidationPipe({ skipMissingProperties: true }))
-        user: AddUserDto,
+        { email }: AddUserDto,
     ) {
-        return this.userService.addUser(user.email);
+        return this.userService.addUser(email);
     }
 }

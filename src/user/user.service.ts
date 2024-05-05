@@ -16,7 +16,7 @@ export class UserService {
         return this.databaseService.user.create({ data: { email } });
     }
 
-    async getUser(email: string): Promise<User> {
+    async getUser(email: string): Promise<User | null> {
         return this.databaseService.user.findUnique({ where: { email } });
     }
 
